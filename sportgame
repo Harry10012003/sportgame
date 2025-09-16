@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Slim – Demo (No-CDN)</title>
+  <style>
+    :root{
+      --bg:#0f172a; --panel:#0b1220; --muted:#111827; --text:#e5e7eb;
+      --primary:#22c55e; --accent:#38bdf8; --ring:#14b8a6; --danger:#ef4444;
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:radial-gradient(1000px 600px at 20% 0%, rgba(56,189,248,0.1), transparent 60%),
+                    radial-gradient(1000px 800px at 120% 20%, rgba(34,197,94,0.12), transparent 60%), var(--bg);
+         color:var(--text);font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+    .title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:22px}
+    .badge{background:rgba(34,197,94,0.15);color:#bbf7d0;border:1px solid rgba(34,197,94,0.4);padding:2px 8px;border-radius:999px;font-size:12px}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .card{background:rgba(11,18,32,0.8);border:1px solid rgba(148,163,184,0.15);border-radius:16px;backdrop-filter: blur(8px)}
+    .card h3{margin:0;padding:16px 16px 0 16px;font-size:16px}
+    .card .content{padding:16px}
+    .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    label{font-size:12px;opacity:.9}
+    input, select, button{
+      background:var(--muted); color:var(--text); border:1px solid rgba(148,163,184,0.2);
+      border-radius:10px; padding:10px 12px; font-size:14px; outline:none;
+    }
+    input:focus, select:focus, button:focus{box-shadow:0 0 0 3px rgba(20,184,166,0.45);border-color:var(--ring)}
+    button{cursor:pointer;transition:transform .03s ease, opacity .15s ease}
+    button.primary{background:linear-gradient(135deg, var(--primary), #16a34a); border:none; font-weight:600}
+    button.secondary{background:linear-gradient(135deg, #1f2937, #111827);}
+    button.ghost{background:transparent;border:1px dashed rgba(148,163,184,0.25)}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .hint{font-size:12px;opacity:.7}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.4);padding:4px 10px;border-radius:999px;font-size:12px}
+    .ring-wrap{position:relative;display:inline-block}
+    .ring{transform:rotate(-90deg)}
+    .ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+    .percent{font-weight:800;font-size:26px}
+    .muted{opacity:.7;font-size:12px}
+    .toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:9999}
+    .toast{background:#0b1220;border:1px solid rgba(148,163,184,0.2);border-radius:14px;padding:12px 14px;min-width:240px;box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+    .toast h4{margin:0 0 4px 0;font-size:14px}
+    .toast p{margin:0;font-size:13px;opacity:.95}
+    .footer{margin-top:20px;text-align:center;opacity:.75;font-size:12px}
+    .icon{display:inline-block;width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#60a5fa);margin-right:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">
+        <span class="icon"></span><span>Coach Slim – Demo web chạy thử (No‑CDN)</span>
+        <span class="badge">MVP</span>
+      </div>
+      <div class="row">
+        <div>
+          <label>Giọng điệu</label><br/>
+          <select id="tone">
+            <option value="gentle">Nhẹ nhàng</option>
+            <option value="playful" selected>Vui tính</option>
+            <option value="roasty">Cà khịa nhẹ</option>
+          </select>
+        </div>
+        <div>
+          <label>Tên gọi</label><br/>
+          <input id="name" value="Bạn đẹp" placeholder="Tên của bạn">
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>🏃‍♀️ Tập nhanh</h3>
+        <div class="content">
+          <div class="row">
+            <label>Thời lượng (phút)</label>
+            <select id="mins">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="5">5</option>
+            </select>
+            <span class="hint">*Demo: 1 phút = 10 giây</span>
+          </div>
+          <div style="display:flex;justify-content:center;padding:12px 0">
+            <div style="position:relative">
+              <div class="ring-wrap">
+                <svg id="ring" width="140" height="140" class="ring">
+                  <circle cx="70" cy="70" r="54" stroke-width="10" stroke="rgba(148,163,184,0.25)" fill="none"></circle>
+                  <circle id="ringBar" cx="70" cy="70" r="54" stroke-width="10" stroke-linecap="round" fill="none"></circle>
+                  <defs>
+                    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#38bdf8"/>
+                      <stop offset="100%" stop-color="#22c55e"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="ring-center">
+                <div id="percent" class="percent">0%</div>
+                <div class="muted">tiến độ</div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <button id="btnStart" class="primary">▶ Chạy đi!</button>
+            <button id="btnNotifyWorkout" class="secondary">🔔 Thử noti tập</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔔 Nhắc nhanh</h3>
+        <div class="content">
+          <div class="row" style="flex-direction:column;align-items:stretch;gap:8px">
+            <button id="btnLunch" class="secondary">🍱 Tới giờ ăn trưa (1 chén cơm)</button>
+            <button id="btnWater" class="secondary">🥤 Uống nước 1 ly</button>
+            <button id="btnPlateau" class="secondary">⚖️ Cân không giảm – chọc vui</button>
+          </div>
+          <div class="hint" style="margin-top:8px">Đây là demo trên web – thông báo dạng toast trong trang (không cần quyền push).</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>⚖️ Cân nặng</h3>
+        <div class="content">
+          <div class="row">
+            <input id="weighInput" placeholder="Nhập cân (kg)" style="width:140px">
+            <button id="btnSaveWeigh">Lưu</button>
+          </div>
+          <div style="margin-top:10px">
+            <div class="hint" style="margin-bottom:6px">Lịch sử gần đây</div>
+            <div id="chips" class="chips"><span class="hint">Chưa có dữ liệu</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <h3>🌙 Ngủ sớm & mẹo nhanh</h3>
+        <div class="content" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+          <div class="content" style="background:rgba(2,6,23,0.35);border-radius:12px;border:1px solid rgba(148,163,184,0.12)">
+            <div class="row" style="justify-content:space-between"><b>Ngủ trước 23:00</b></div>
+            <div>Ngủ đủ giúp giảm thèm ăn khuya và phục hồi sau tập.</div>
+            <div style="margin-top:8px"><button class="ghost" id="btnSleep">Thử noti ngủ</button></div>
+          </div>
+          <div class="content" style="background:rgba(2,6,23,0.35);border-radius:12px;border:1px solid rgba(148,163,184,0.12)">
+            <div class="row" style="justify-content:space-between"><b>Bữa xế lành mạnh</b></div>
+            <div>Trái cây nguyên quả hoặc sữa chua không đường nhé.</div>
+            <div style="margin-top:8px"><button class="ghost" id="btnSnack">Thử noti snack</button></div>
+          </div>
+          <div class="content" style="background:rgba(2,6,23,0.35);border-radius:12px;border:1px solid rgba(148,163,184,0.12)">
+            <div class="row" style="justify-content:space-between"><b>Đi bộ sau ăn</b></div>
+            <div>10’ đi bộ nhẹ giúp tiêu năng lượng và khoẻ tiêu hoá.</div>
+            <div style="margin-top:8px"><button class="ghost" id="btnWalk">Thử noti đi bộ</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toasts" id="toasts"></div>
+    <div class="footer">© 2025 Coach Slim – Demo (Vanilla JS). Giọng điệu tôn trọng, vui nhộn, có tuỳ chọn “cà khịa nhẹ”.</div>
+  </div>
+
+  <script>
+    const MESSAGES = {
+      lunch:{gentle:[ "Đến giờ ăn trưa rồi nè. Nhớ 1 chén cơm thôi nhé!","Đã tới bữa trưa. Một chén cơm + nhiều rau cho nhẹ bụng nha!"],
+             playful:["Bụng kêu chưa? Trưa nay 1 chén cơm + rau đầy tô, ăn xong đẹp liền!","Trưa tới rồi! Chén cơm gọi tên bạn — ăn gọn nhẹ cho vui bụng nhé 😌"],
+             roasty:[ "Tới giờ ăn trưa. 1 chén cơm thôi nha, đừng để chén thứ 2 rủ rê 😜","Ăn trưa nè! Lỡ xúc chén thứ 2 là cân cười bạn đó nha 🙃"]},
+      water:{gentle:["Uống 1 ly nước cho tỉnh táo nhé!"],
+             playful:["Cheers nè! Uống 1 ly nước cho da mướt eo thon!"],
+             roasty:["Uống nước đi chứ không mỡ nó khô lại khó đốt lắm á 😅"]},
+      workout:{gentle:["Đến giờ tập rồi, mình vận động {mins}’ cho khoẻ người nha!"],
+               playful:["Chuông réo! {mins}’ chạy đi… chạy đi 🏃‍♀️ xong khoẻ liền!"],
+               roasty:["{mins}’ tập liền! Không tập là mỡ nó chạy tới ôm đó!"]},
+      plateau:{gentle:["Số cân đang nghỉ lễ tí thôi. Thử đi bộ thêm 10’ nhé?"],
+               playful:["Kim cân hơi lỳ nha! Thêm 10’ đi bộ sau ăn tối coi nào."],
+               roasty:["Vẫn còn mập quá rồi 😅 coi chừng ê sắc đó nha! Thêm 10’ chạy chỗ đi!"]},
+      success:{gentle:["Tuyệt vời! Cân đã nhích xuống rồi ✨"],
+               playful:["Quá đãaa! Cân hạ, mood lên 🎉"],
+               roasty:["Thấy chưa! Chút xíu cố là cân sợ bạn liền 😎"]},
+    };
+    const pick = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+    const fmtWorkout = (tone, mins)=> pick(MESSAGES.workout[tone]).replace("{mins}", String(mins));
+
+    const toasts = document.getElementById('toasts');
+    function pushToast(title, description){
+      const wrap = document.createElement('div');
+      wrap.className = 'toast';
+      wrap.innerHTML = `<h4>${title}</h4><p>${description}</p>`;
+      toasts.appendChild(wrap);
+      setTimeout(()=>{
+        wrap.style.opacity = '0';
+        wrap.style.transform = 'translateY(10px)';
+        setTimeout(()=>wrap.remove(), 300);
+      }, 3400);
+    }
+
+    const toneEl = document.getElementById('tone');
+    const minsEl = document.getElementById('mins');
+    const btnStart = document.getElementById('btnStart');
+    const btnNotifyWorkout = document.getElementById('btnNotifyWorkout');
+    const btnLunch = document.getElementById('btnLunch');
+    const btnWater = document.getElementById('btnWater');
+    const btnPlateau = document.getElementById('btnPlateau');
+    const weighInput = document.getElementById('weighInput');
+    const btnSaveWeigh = document.getElementById('btnSaveWeigh');
+    const chips = document.getElementById('chips');
+    const ringBar = document.getElementById('ringBar');
+    const percent = document.getElementById('percent');
+
+    const radius = 54, perim = 2*Math.PI*radius;
+    ringBar.setAttribute('stroke', 'url(#grad)');
+    ringBar.setAttribute('stroke-dasharray', `0 ${perim}`);
+    function setProgress(p){
+      const nom = (p/100)*perim;
+      ringBar.setAttribute('stroke-dasharray', `${nom} ${perim}`);
+      percent.textContent = Math.round(p) + '%';
+    }
+
+    let active = false, secs = 0, timerId = null;
+    function startWorkout(){
+      if(active) return;
+      const mins = parseInt(minsEl.value,10) || 1;
+      secs = mins*10;
+      active = true;
+      btnStart.disabled = true;
+      pushToast('Bắt đầu tập', fmtWorkout(toneEl.value, mins));
+      setProgress(0);
+      timerId = setInterval(()=>{
+        secs -= 1;
+        const total = mins*10;
+        const done = total - secs;
+        const p = Math.max(0, Math.min(100, Math.round((done/total)*100)));
+        setProgress(p);
+        if(secs<=0){
+          clearInterval(timerId);
+          active = false;
+          btnStart.disabled = false;
+          setProgress(100);
+          pushToast('Xong buổi tập!', pick(MESSAGES.success[toneEl.value]));
+        }
+      }, 1000);
+    }
+
+    function notify(type){
+      const tone = toneEl.value;
+      const mins = parseInt(minsEl.value,10) || 1;
+      const titleMap = {lunch:'Tới giờ ăn trưa', water:'Uống nước', workout:'Tập luyện', plateau:'Nhắc nhẹ', success:'Hoàn thành'};
+      let desc = '';
+      if(type==='workout') desc = fmtWorkout(tone, mins);
+      else desc = pick(MESSAGES[type][tone]);
+      pushToast(titleMap[type] || 'Thông báo', desc);
+    }
+
+    const weights = [];
+    function renderWeights(){
+      chips.innerHTML='';
+      if(weights.length===0){ chips.innerHTML = '<span class="hint">Chưa có dữ liệu</span>'; return; }
+      for(const w of weights){
+        const span = document.createElement('span');
+        span.className='chip';
+        span.textContent = w.toFixed(1)+' kg';
+        chips.appendChild(span);
+      }
+    }
+    function addWeigh(){
+      const v = parseFloat(weighInput.value);
+      if(isNaN(v)) return;
+      weights.push(v);
+      while(weights.length>7) weights.shift();
+      weighInput.value='';
+      renderWeights();
+      if(weights.length>=4){
+        const r = weights.slice(-4);
+        const diff = r[r.length-1]-r[0];
+        if(diff >= -0.1) notify('plateau');
+        else notify('success');
+      }else{
+        pushToast('Đã lưu cân nặng','Tiếp tục theo dõi nha!');
+      }
+    }
+
+    btnStart.addEventListener('click', startWorkout);
+    btnNotifyWorkout.addEventListener('click', ()=>notify('workout'));
+    btnLunch.addEventListener('click', ()=>notify('lunch'));
+    btnWater.addEventListener('click', ()=>notify('water'));
+    btnPlateau.addEventListener('click', ()=>notify('plateau'));
+    btnSaveWeigh.addEventListener('click', addWeigh);
+    document.getElementById('btnSleep').addEventListener('click', ()=>pushToast('Đi ngủ sớm','Đèn ngủ gọi tên bạn nè. Trước 23:00 nha!'));
+    document.getElementById('btnSnack').addEventListener('click', ()=>pushToast('Snack nhẹ','Ổi/táo/bưởi – ngon lành mà vẫn giữ dáng!'));
+    document.getElementById('btnWalk').addEventListener('click', ()=>pushToast('Đi bộ 10’','Đứng dậy đi dạo cho mát, tiêu bớt ‘thuế’ bữa trưa nè!'));
+    setProgress(0); renderWeights();
+  </script>
+</body>
+</html>
